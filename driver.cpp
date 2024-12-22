@@ -3,10 +3,11 @@
 #include <string>
 #include <chrono>
 #include <cstdlib>
-#include <stdexcept>
+#include <stdexcept> 
 #include "matmul.hpp"
 
 using namespace std;
+
 void freeMatrix(int** matrix, int rows);
 bool checkMatrix(int** res, int** C, int rows, int cols) {
     for (int i = 0; i < rows; i++) {
@@ -23,12 +24,12 @@ int** readMatrix(const string& filename, int& rows, int& cols) {
     ifstream infile(filename);
     if (!infile.is_open()) {
         cerr << "Error: Unable to open file: " << filename << endl;
-        exit(EXIT_FAILURE);
+        throw runtime_error("Unable to open file");
     }
 
     if (!(infile >> rows >> cols) || rows <= 0 || cols <= 0) {
         cerr << "Error: Invalid matrix dimensions in file: " << filename << endl;
-        exit(EXIT_FAILURE);
+        throw runtime_error("Invalid matrix dimensions");
     }
 
     int** matrix = new int*[rows];
@@ -41,7 +42,7 @@ int** readMatrix(const string& filename, int& rows, int& cols) {
             if (!(infile >> matrix[i][j])) {
                 cerr << "Error: Insufficient or invalid data in file: " << filename << endl;
                 freeMatrix(matrix, rows);
-                exit(EXIT_FAILURE);
+                throw runtime_error("Invalid matrix data");
             }
         }
     }
@@ -67,7 +68,12 @@ void freeMatrix(int** matrix, int rows) {
 }
 
 int main() {
-    string testCases[] = {"Unit_test/unit_1 , Unit_test/unit_2 , Unit_test/unit_3 , Unit_test/unit_4 , Unit_test/unit_5 , Unit_test/unit_6"};
+    string testCases[] = {
+        "Unit_test/unit_1",
+        "Unit_test/unit_8",
+        "Unit_test/unit_9",
+        "Unit_test/unit_10"
+    };
     int numTestCases = sizeof(testCases) / sizeof(testCases[0]);
 
     ofstream resultsFile("results.csv");
@@ -77,7 +83,7 @@ int main() {
     }
 
     // Write CSV header
-    resultsFile << "Test Case,Status,ijk Time (ms),ikj Time (ms),jik Time (ms),jki Time (ms),kij Time (ms),kji Time (ms)\n";
+    resultsFile << "Test Case,Status,Success,ijk Time (ms),ikj Time (ms),jik Time (ms),jki Time (ms),kij Time (ms),kji Time (ms)\n";
 
     for (int t = 0; t < numTestCases; t++) {
         string subdir = testCases[t];
@@ -92,19 +98,20 @@ int main() {
         int** A = nullptr;
         int** B = nullptr;
         int** C = nullptr;
-        
+        string status = "Passed";
+        string success = "Success";
+
         try {
             A = readMatrix(fileA, rowsA, colsA);
             B = readMatrix(fileB, rowsB, colsB);
             C = readMatrix(fileC, rowsC, colsC);
         } catch (const exception& e) {
-            resultsFile << subdir << ",Error: Unable to read matrices,,,,,,\n";
+            resultsFile << subdir << ",Error: Unable to read matrices," << success << ",,,,,,\n";
             continue;
         }
 
         if (colsA != rowsB) {
-            cerr << "Error: Matrix dimensions do not match for multiplication (A columns: " << colsA << ", B rows: " << rowsB << ")!" << endl;
-            resultsFile << subdir << ",Error: Dimension mismatch,,,,,,\n";
+            resultsFile << subdir << ",Error: Dimension mismatch," << success << ",,,,,,\n";
             freeMatrix(A, rowsA);
             freeMatrix(B, rowsB);
             freeMatrix(C, rowsC);
@@ -117,7 +124,6 @@ int main() {
         }
 
         double durations[6] = {0};
-        string status = "Passed";
 
         for (int choice = 1; choice <= 6; choice++) {
             double totalDuration = 0.0;
@@ -136,10 +142,11 @@ int main() {
 
             if (!checkMatrix(res, C, rowsC, colsC)) {
                 status = "Failed";
+                success = "Failure";
             }
         }
 
-        resultsFile << subdir << "," << status;
+        resultsFile << subdir << "," << status << "," << success;
         for (double duration : durations) {
             resultsFile << "," << duration;
         }
