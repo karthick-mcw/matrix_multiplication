@@ -48,6 +48,7 @@ int** readMatrix(const string& filename, int& rows, int& cols) {
     }
 
     infile.close();
+    
     return matrix;
 }
 
@@ -66,7 +67,6 @@ void freeMatrix(int** matrix, int rows) {
     }
     delete[] matrix;
 }
-
 int main() {
     string testCases[] = {
         "Unit_test/unit_1",
@@ -105,8 +105,17 @@ int main() {
             A = readMatrix(fileA, rowsA, colsA);
             B = readMatrix(fileB, rowsB, colsB);
             C = readMatrix(fileC, rowsC, colsC);
-        } catch (const exception& e) {
-            resultsFile << subdir << ",Error: Unable to read matrices," << success << ",,,,,,\n";
+        } catch (const runtime_error& e) {
+            // Catch specific error types and write them to the result file
+            if (string(e.what()) == "Unable to open file") {
+                resultsFile << subdir << ",Error: Unable to open file," << success << ",,,,,,\n";
+            } else if (string(e.what()) == "Invalid matrix dimensions") {
+                resultsFile << subdir << ",Error: Invalid matrix dimensions," << success << ",,,,,,\n";
+            } else if (string(e.what()) == "Invalid matrix data") {
+                resultsFile << subdir << ",Error: Invalid matrix data," << success << ",,,,,,\n";
+            } else {
+                resultsFile << subdir << ",Error: Unknown error," << success << ",,,,,,\n";
+            }
             continue;
         }
 

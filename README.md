@@ -8,6 +8,7 @@ This project performs matrix multiplication and verifies the results with expect
 - **`matmul.h`**: Header file for the matrix multiplication function (optional).
 - **`driver.c`**: Main program that reads matrices, calls the `matrix_multiplication` function, and verifies the result.
 - **`Unit_test/`**: Contains unit test cases with input matrices `A.txt`, `B.txt`, and the expected output `C.txt`.
+- **`results.csv`**: Contains the final results of the output after running the code
 
 ## Steps to Build and Run
 
@@ -17,7 +18,5 @@ Follow the steps below to build and run the program:
   - ## Step 1: 
     Navigate to the project folder using `cd Matrix_Multiplication`
   - ## Step 2:
-    Compile the project using `g++ driver.c matmul.c -o driver`
-  - ## Step 3: 
-    Run the program using `./driver`
+    Compile the project using git bash `bash run_tests.sh.sh
 
