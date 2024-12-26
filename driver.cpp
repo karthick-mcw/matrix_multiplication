@@ -68,12 +68,11 @@ void freeMatrix(int** matrix, int rows) {
     delete[] matrix;
 }
 int main() {
-    string testCases[] = {
-        "Unit_test/unit_1",
-        "Unit_test/unit_8",
-        "Unit_test/unit_9",
-        "Unit_test/unit_10"
-    };
+    const int cases = 10;
+    string testCases[cases];
+    for(int i = 1 ; i <= cases ; i++){
+        testCases[i] = "Unit_test/unit_" + std::to_string(i);
+    }
     int numTestCases = sizeof(testCases) / sizeof(testCases[0]);
 
     ofstream resultsFile("results.csv");
@@ -81,7 +80,6 @@ int main() {
         cerr << "Error: Unable to open results.csv for writing." << endl;
         return EXIT_FAILURE;
     }
-
     // Write CSV header
     resultsFile << "Test Case,Status,Success,ijk Time (ms),ikj Time (ms),jik Time (ms),jki Time (ms),kij Time (ms),kji Time (ms)\n";
 
